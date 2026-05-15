@@ -4,6 +4,7 @@
 ![Flask](https://img.shields.io/badge/Flask-2.x-black?logo=flask&logoColor=white)
 ![LangGraph](https://img.shields.io/badge/LangGraph-Multi--Agent-purple)
 ![Status](https://img.shields.io/badge/Status-Active-success)
+
 基于 LangGraph 的智能送礼推荐助手，通过多Agent协作帮助用户快速找到合适的礼物。
 
 ## 项目结构
