@@ -1,0 +1,49 @@
+INFO:     Started server process [64319]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:7890 (Press CTRL+C to quit)
+INFO:     121.199.22.223:46548 - "GET /chat HTTP/1.1" 200 OK
+[get_filtered_options] slot=gift_type, recipient=女朋友, occasion=生日, total=4, filtered=4
+INFO:     121.199.22.223:46548 - "POST /chat HTTP/1.1" 200 OK
+INFO:     204.76.203.51:33832 - "GET / HTTP/1.1" 200 OK
+INFO:     156.238.229.134:38914 - "GET /?0.12483980746639450018530808 HTTP/1.1" 200 OK
+INFO:     39.144.124.134:39521 - "GET /chat HTTP/1.1" 200 OK
+INFO:     204.76.203.51:37538 - "GET / HTTP/1.1" 200 OK
+[get_filtered_options] slot=budget, recipient=闺蜜, occasion=产后, total=5, filtered=5
+INFO:     101.70.125.171:50054 - "POST /chat HTTP/1.1" 200 OK
+INFO:     204.76.203.51:54678 - "GET / HTTP/1.1" 200 OK
+WARNING:  Unsupported upgrade request.
+WARNING:  No supported WebSocket library detected. Please use "pip install 'uvicorn[standard]'", or install 'websockets' or 'wsproto' manually.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Unsupported upgrade request.
+WARNING:  No supported WebSocket library detected. Please use "pip install 'uvicorn[standard]'", or install 'websockets' or 'wsproto' manually.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     115.216.115.134:53985 - "GET / HTTP/1.1" 200 OK
+INFO:     115.216.115.134:54085 - "GET /chat HTTP/1.1" 200 OK
+INFO:     204.76.203.51:60664 - "GET / HTTP/1.1" 200 OK
+WARNING:  Unsupported upgrade request.
+WARNING:  No supported WebSocket library detected. Please use "pip install 'uvicorn[standard]'", or install 'websockets' or 'wsproto' manually.
+WARNING:  Invalid HTTP request received.
+INFO:     59.82.83.188:20369 - "GET / HTTP/1.1" 200 OK
+INFO:     59.82.83.188:20369 - "GET / HTTP/1.1" 200 OK
+INFO:     59.82.83.188:20369 - "GET / HTTP/1.1" 200 OK
+INFO:     59.82.83.188:20369 - "GET / HTTP/1.1" 200 OK
+INFO:     204.76.203.51:50192 - "GET / HTTP/1.1" 200 OK
+INFO:     121.199.22.223:44291 - "GET /chat HTTP/1.1" 200 OK
+[get_filtered_options] slot=gift_type, recipient=女朋友, occasion=生日, total=4, filtered=4
+INFO:     121.199.22.223:44291 - "POST /chat HTTP/1.1" 200 OK
+[recommend_agent] LLM从gifts.json中选择了 4 个礼物
+INFO:     121.199.22.223:49563 - "POST /chat HTTP/1.1" 200 OK
+[intent_agent] 用户点击了第2个商品卡片
+INFO:     121.199.22.223:7318 - "POST /chat HTTP/1.1" 200 OK
+INFO:     218.72.79.77:53304 - "GET /chat HTTP/1.1" 200 OK
+[get_filtered_options] slot=gift_type, recipient=女朋友, occasion=生日, total=4, filtered=4
+INFO:     218.72.79.77:53304 - "POST /chat HTTP/1.1" 200 OK
+[recommend_agent] LLM从gifts.json中选择了 4 个礼物
+INFO:     218.72.79.77:53304 - "POST /chat HTTP/1.1" 200 OK
+INFO:     121.199.22.223:49871 - "GET /chat HTTP/1.1" 200 OK
+[get_filtered_options] slot=occasion, recipient=爸爸, occasion=None, total=9, filtered=5
+INFO:     121.199.22.223:52842 - "POST /chat HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.

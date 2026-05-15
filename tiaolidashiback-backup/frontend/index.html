@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎁 挑礼大师</title>
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #ede9fe;
+      --primary-dark: #5b21b6;
+      --accent: #f59e0b;
+      --bg: #faf5ff;
+      --card: #ffffff;
+      --text: #1e1b2e;
+      --text-secondary: #6b7280;
+      --border: #e5e7eb;
+      --user-bubble: #7c3aed;
+      --bot-bubble: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Chat Container */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .chat-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-content {
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px;
+      flex: 1;
+    }
+    .input-wrapper {
+      border-top: 1px solid var(--border);
+      background: white;
+      padding: 16px 20px;
+    }
+    .input-content {
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    header {
+      background: linear-gradient(135deg, #5b21b6, #7c3aed, #a78bfa);
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 12px rgba(124,58,237,0.3);
+      flex-shrink: 0;
+    }
+    .logo { font-size: 2rem; }
+    .header-text h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 1px; }
+    .header-text p { font-size: 0.82rem; opacity: 0.85; margin-top: 2px; }
+    .header-badge {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+    }
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    #slots-bar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 20px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      min-height: 42px;
+      align-items: center;
+    }
+    .slot-chip {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+    #chat-area {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .message {
+      display: flex;
+      gap: 10px;
+      animation: slideUp 0.3s ease;
+    }
+    .message.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .bot-avatar { background: var(--primary-light); }
+    .user-avatar { background: var(--accent); }
+    .bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.93rem;
+      line-height: 1.7;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: keep-all;
+    }
+    .bot .bubble {
+      background: var(--bot-bubble);
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .user .bubble {
+      background: var(--user-bubble);
+      color: white;
+      border-top-right-radius: 4px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+      width: 100%;
+    }
+    .product-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card.clickable {
+      cursor: pointer;
+    }
+    .product-card.clickable::after {
+      content: '点击查看详情';
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 0.7rem;
+      color: var(--primary);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .product-card.clickable:hover::after {
+      opacity: 1;
+    }
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    .product-card:hover {
+      box-shadow: 0 6px 20px rgba(124,58,237,0.15);
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    .product-emoji { font-size: 2rem; margin-bottom: 8px; }
+    .product-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+    .product-price { font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-bottom: 8px; }
+    .product-reason { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+    .product-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .product-tag {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+    .typing {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 14px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      border-top-left-radius: 4px;
+      width: fit-content;
+    }
+    .status-text {
+      color: #888;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-text::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .typing span {
+      width: 7px; height: 7px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    #input-area {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    #user-input {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      padding: 12px 18px;
+      font-size: 0.93rem;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      max-height: 120px;
+      line-height: 1.5;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    #user-input:focus { border-color: var(--primary); }
+    #user-input::placeholder { color: #aaa; }
+    #send-btn {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border: none; border-radius: 50%;
+      color: white; font-size: 1.2rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    #send-btn:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+    #send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .quick-replies {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .quick-reply {
+      background: white;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .quick-reply:hover { background: var(--primary); color: white; }
+    .slot-options-message {
+      animation: fadeIn 0.3s ease;
+    }
+    .slot-options-message .quick-reply {
+      background: linear-gradient(135deg, #f3f0ff, #fff);
+      border-color: #a78bfa;
+      font-size: 0.85rem;
+      padding: 8px 16px;
+    }
+    .slot-options-message .quick-reply:hover {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border-color: #7c3aed;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #reset-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      border-radius: 10px;
+      transition: all 0.2s;
+      margin-left: 8px;
+    }
+    #reset-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+    #chat-area::-webkit-scrollbar { width: 4px; }
+    #chat-area::-webkit-scrollbar-track { background: transparent; }
+    #chat-area::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+    @media (max-width: 600px) {
+      .bubble { max-width: 85%; }
+      .product-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎁</div>
+  <div class="header-text">
+    <h1>挑礼大师</h1>
+    <p>AI 礼物推荐助手 · Multi-Agent 驱动</p>
+  </div>
+  <div class="header-actions">
+    <div class="header-badge">✨ DeepSeek 驱动</div>
+    <a href="/" class="back-btn">← 返回首页</a>
+    <button id="reset-btn" onclick="resetChat()">🔄 重新开始</button>
+  </div>
+</header>
+
+<!-- Chat Container -->
+<div class="chat-container">
+  <div id="slots-bar">
+    <div class="chat-content" style="padding: 8px 20px;">
+      <span style="color:#aaa; font-size:0.8rem;">💡 开始对话，我会记录你的需求...</span>
+    </div>
+  </div>
+
+  <div class="chat-wrapper">
+    <div class="chat-content">
+      <div id="chat-area">
+        <div class="message bot">
+          <div class="avatar bot-avatar">🎁</div>
+          <div>
+            <div class="bubble">
+              嗨！我是挑礼大师 🎉<br/>
+              送礼这件事交给我，专治选礼物难、不知道送什么！<br/><br/>
+              你可以直接告诉我：<strong>送给谁、什么场合、大概预算</strong>，我来帮你找到最合适的礼物 ✨
+            </div>
+            <div class="quick-replies">
+              <button class="quick-reply" onclick="sendQuick('女朋友生日，预算300-500元')">🎂 女朋友生日</button>
+              <button class="quick-reply" onclick="sendQuick('父母节日礼物，预算500元左右')">👨‍👩‍👧 父母节日</button>
+              <button class="quick-reply" onclick="sendQuick('朋友升职，想送个有意义的礼物，预算200元')">🎊 朋友升职</button>
+              <button class="quick-reply" onclick="sendQuick('老板送礼，比较正式，预算1000元')">💼 商务送礼</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-wrapper">
+    <div class="input-content">
+      <div id="input-area">
+        <textarea
+          id="user-input"
+          placeholder="告诉我你的送礼需求..."
+          rows="1"
+          onkeydown="handleKeydown(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button id="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 自动检测 API 地址：生产环境使用相对路径，开发环境使用 localhost
+  const API_BASE = window.location.hostname === 'localhost' 
+    ? 'http://localhost:7890' 
+    : '';  // 生产环境使用相对路径，自动匹配当前域名
+  
+  console.log('[INIT] API_BASE configured as:', API_BASE);
+  console.log('[INIT] Hostname:', window.location.hostname);
+  console.log('[INIT] Full URL:', window.location.href);
+  let history = [];
+  let slots = {};  // 槽位状态
+  let excludedGifts = [];  // 用户不喜欢的商品列表
+  let lastRecommendations = [];  // 上次推荐的商品
+  let isLoading = false;
+
+  async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const message = input.value.trim();
+    if (!message || isLoading) return;
+
+    // 检测用户是否表示不喜欢之前的推荐
+    const dislikePatterns = ['不喜欢', '不合适', '换个', '换一', '不要这些', '都不喜欢', '不喜欢这些'];
+    const isDislike = dislikePatterns.some(p => message.includes(p));
+    if (isDislike && lastRecommendations.length > 0) {
+      // 将上次推荐的商品加入排除列表
+      lastRecommendations.forEach(item => {
+        if (item.name && !excludedGifts.includes(item.name)) {
+          excludedGifts.push(item.name);
+        }
+      });
+      console.log('[排除商品]', excludedGifts);
+    }
+
+    input.value = '';
+    autoResize(input);
+    appendMessage('user', message);
+    history.push({ role: 'user', content: message });
+
+    const typingId = showTyping();
+    setLoading(true);
+
+    try {
+      console.log('[DEBUG] ====== sendMessage Start ======');
+      console.log('[DEBUG] User message:', message);
+      console.log('[DEBUG] Current history length:', history.length);
+      console.log('[DEBUG] Current history:', JSON.stringify(history, null, 2));
+      console.log('[DEBUG] Current slots:', JSON.stringify(slots, null, 2));
+      console.log('[DEBUG] Excluded gifts:', excludedGifts);
+
+      // 构建包含排除商品的历史
+      const historyWithState = [...history.slice(0, -1)];
+      console.log('[DEBUG] History before adding state:', JSON.stringify(historyWithState, null, 2));
+      
+      if (excludedGifts.length > 0) {
+        historyWithState.push({
+          role: '_state',
+          content: { excluded_gifts: excludedGifts }
+        });
+        console.log('[DEBUG] Added _state with excluded_gifts');
+      }
+
+      const requestBody = { message, history: historyWithState };
+      console.log('[DEBUG] Request body:', JSON.stringify(requestBody, null, 2));
+      console.log('[DEBUG] API endpoint:', `${API_BASE}/chat`);
+
+      console.log('[DEBUG] Sending fetch request...');
+      console.log('[DEBUG] Request URL:', `${API_BASE}/chat`);
+      console.log('[DEBUG] Request method: POST');
+      console.log('[DEBUG] Request headers:', { 'Content-Type': 'application/json' });
+      
+      let resp;
+      try {
+        resp = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+      } catch (networkErr) {
+        console.error('[ERROR] Network error during fetch:', networkErr);
+        console.error('[ERROR] API_BASE:', API_BASE);
+        console.error('[ERROR] Full URL:', `${API_BASE}/chat`);
+        console.error('[ERROR] Current hostname:', window.location.hostname);
+        console.error('[ERROR] Current port:', window.location.port);
+        throw new Error(`网络请求失败: ${networkErr.message}. 请检查后端服务是否运行`);
+      }
+      
+      console.log('[DEBUG] Response received, status:', resp.status);
+      console.log('[DEBUG] Response statusText:', resp.statusText);
+      console.log('[DEBUG] Response headers:', JSON.stringify([...resp.headers.entries()]));
+      
+      if (!resp.ok) {
+        console.error('[ERROR] HTTP error, status:', resp.status);
+        let errorText = '';
+        try {
+          errorText = await resp.text();
+          console.error('[ERROR] Response body:', errorText.substring(0, 500));
+        } catch (e) {
+          console.error('[ERROR] Could not read response body:', e);
+        }
+        
+        // 根据状态码给出更具体的错误信息
+        let errorMsg = `HTTP ${resp.status}: ${resp.statusText}`;
+        if (resp.status === 502) {
+          errorMsg = '后端服务不可用 (502 Bad Gateway)。可能原因：\n' +
+                     '1. 后端服务未启动\n' +
+                     '2. 后端服务崩溃或重启中\n' +
+                     '3. Nginx/代理配置错误\n' +
+                     '4. 后端端口被防火墙阻挡';
+        } else if (resp.status === 503) {
+          errorMsg = '后端服务过载或维护中 (503)';
+        } else if (resp.status === 504) {
+          errorMsg = '后端响应超时 (504 Gateway Timeout)';
+        }
+        
+        throw new Error(errorMsg);
+      }
+      
+      const data = await resp.json();
+      console.log('[DEBUG] Response data:', JSON.stringify(data, null, 2));
+
+      removeTyping(typingId);
+      
+      console.log('[DEBUG] Bot reply:', data.reply);
+      console.log('[DEBUG] Recommendations:', data.recommendations);
+      appendBotMessage(data.reply, data.recommendations);
+      
+      history.push({ role: 'assistant', content: data.reply });
+      console.log('[DEBUG] Updated history length:', history.length);
+
+      // 保存本次推荐
+      if (data.recommendations && data.recommendations.length > 0) {
+        lastRecommendations = data.recommendations;
+        console.log('[DEBUG] Saved recommendations, count:', data.recommendations.length);
+      }
+
+      if (data.slots) {
+        console.log('[DEBUG] Updating slots:', JSON.stringify(data.slots, null, 2));
+        updateSlots(data.slots, data.user_intent);
+      }
+
+      // 如果有槽位选项，显示快速回复按钮
+      if (data.asking_slot && data.slot_options && data.slot_options.length > 0) {
+        console.log('[DEBUG] Showing slot options for:', data.asking_slot);
+        console.log('[DEBUG] Slot options:', JSON.stringify(data.slot_options, null, 2));
+        showSlotOptions(data.asking_slot, data.slot_options);
+      }
+
+      console.log('[DEBUG] ====== sendMessage End ======');
+
+    } catch (err) {
+      console.error('[ERROR] ====== sendMessage Exception ======');
+      console.error('[ERROR] Error type:', err.constructor.name);
+      console.error('[ERROR] Error message:', err.message);
+      console.error('[ERROR] Error stack:', err.stack);
+      console.error('[ERROR] Current history at error:', JSON.stringify(history, null, 2));
+      console.error('[ERROR] Current slots at error:', JSON.stringify(slots, null, 2));
+      console.error('[ERROR] API_BASE:', API_BASE);
+      console.error('[ERROR] Window location:', window.location.href);
+      
+      removeTyping(typingId);
+      const serverAddr = window.location.hostname === 'localhost' ? 'localhost:7890' : window.location.host;
+      appendMessage('bot', `⚠️ 连接后端失败：${err.message}。请确认后端服务已在 ${serverAddr} 启动。`);
+      console.error('[ERROR] ====== sendMessage End Exception ======');
+    } finally {
+      setLoading(false);
+      console.log('[DEBUG] setLoading(false) called');
+    }
+  }
+
+  function sendQuick(text) {
+    document.getElementById('user-input').value = text;
+    sendMessage();
+  }
+
+  // 点击商品卡片显示详情
+  async function showProductDetail(index) {
+    if (!lastRecommendations || index >= lastRecommendations.length) {
+      console.error('[showProductDetail] 商品索引无效');
+      return;
+    }
+
+    const product = lastRecommendations[index];
+    const chatArea = document.getElementById('chat-area');
+
+    // 显示用户点击行为
+    const userDiv = document.createElement('div');
+    userDiv.className = 'message user';
+    userDiv.innerHTML = `
+      <div class="avatar user-avatar">🙋</div>
+      <div class="bubble">我想了解一下第${index + 1}个商品：${escapeHtml(product.name || '')}</div>
+    `;
+    chatArea.appendChild(userDiv);
+    history.push({ role: 'user', content: `我想了解一下第${index + 1}个商品` });
+    scrollToBottom();
+
+    // 显示加载状态
+    const typingId = showTyping();
+    setLoading(true);
+
+    try {
+      const resp = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `第${index + 1}个`,
+          history: history,
+          selected_index: index,
+          recommendations: lastRecommendations
+        })
+      });
+
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+
+      removeTyping(typingId);
+
+      // 显示详细回复（不包含商品卡片）
+      const botDiv = document.createElement('div');
+      botDiv.className = 'message bot';
+      botDiv.innerHTML = `
+        <div class="avatar bot-avatar">🎁</div>
+        <div class="bubble">${escapeHtml(data.reply).replace(/\n/g, '<br/>')}</div>
+      `;
+      chatArea.appendChild(botDiv);
+      history.push({ role: 'assistant', content: data.reply });
+      scrollToBottom();
+
+    } catch (err) {
+      removeTyping(typingId);
+      appendMessage('bot', `⚠️ 获取商品详情失败：${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // 显示槽位选项的快速回复按钮
+  function showSlotOptions(slotName, options) {
+    const chatArea = document.getElementById('chat-area');
+    const div = document.createElement('div');
+    div.className = 'message bot slot-options-message';
+    div.style.marginTop = '8px';
+
+    // 根据槽位类型显示不同的提示
+    const hints = {
+      'recipient': '点击选择，或告诉我其他送礼对象：',
+      'occasion': '点击选择，或告诉我其他场合：',
+      'budget': '点击选择，或告诉我其他预算：',
+      'gift_type': '点击选择礼物类型：'
+    };
+    const hint = hints[slotName] || '点击选择，或自行输入：';
+
+    let html = `
+      <div class="avatar bot-avatar" style="visibility:hidden;">🎁</div>
+      <div style="flex:1;">
+        <div style="color:#666; font-size:0.85rem; margin-bottom:8px; padding-left:4px;">${hint}</div>
+        <div class="quick-replies">
+    `;
+
+    options.forEach(opt => {
+      const desc = opt.desc ? ` (${opt.desc})` : '';
+      html += `<button class="quick-reply" onclick="sendQuick('${opt.value}')">${opt.text}${desc}</button>`;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+
+    div.innerHTML = html;
+    chatArea.appendChild(div);
+    scrollToBottom();
+  }
+
+  function appendMessage(role, content) {
+    const chatArea = document.getElementById('chat-area');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    const avatarEmoji = role === 'user' ? '🙋' : '🎁';
+    const avatarClass = role === 'user' ? 'user-avatar' : 'bot-avatar';
+    div.innerHTML = `
+      <div class="avatar ${avatarClass}">${avatarEmoji}</div>
+      <div class="bubble">${escapeHtml(content).replace(/\n/g, '<br/>')}</div>
+    `;
+    chatArea.appendChild(div);
+    scrollToBottom();
+  }
+
+  function appendBotMessage(reply, recommendations) {
+    const chatArea = document.getElementById('chat-area');
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    let html = `
+      <div class="avatar bot-avatar">🎁</div>
+      <div style="flex:1; max-width: calc(100% - 46px);">
+        <div class="bubble">${escapeHtml(reply).replace(/\n/g, '<br/>')}</div>
+    `;
+
+    if (recommendations && recommendations.length > 0) {
+      html += `<div class="product-grid">`;
+      recommendations.forEach((item, idx) => {
+        const tags = (item.tags || []).map(t => `<span class="product-tag">${t}</span>`).join('');
+        html += `
+          <div class="product-card clickable" onclick="showProductDetail(${idx})" title="点击查看详情">
+            <div class="product-emoji">${item.emoji || '🎁'}</div>
+            <div class="product-name">${escapeHtml(item.name || '')}</div>
+            <div class="product-price">${escapeHtml(item.price || '')}</div>
+            <div class="product-reason">${escapeHtml(item.reason || '')}</div>
+            <div class="product-tags">${tags}</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      html += `
+        <div class="quick-replies" style="margin-top:12px;">
+          <button class="quick-reply" onclick="sendQuick('这些都不太合适，换个方向')">🔄 换个方向</button>
+          <button class="quick-reply" onclick="sendQuick('价格能再低一点吗')">💰 预算低一点</button>
+          <button class="quick-reply" onclick="sendQuick('有没有更高端一点的选择')">✨ 高端一点</button>
+        </div>
+      `;
+    }
+
+    html += `</div>`;
+    div.innerHTML = html;
+    chatArea.appendChild(div);
+    scrollToBottom();
+  }
+
+  function updateSlots(slots, userIntent) {
+    for (const [k, v] of Object.entries(slots)) {
+      if (v) slots[k] = v;
+    }
+
+    // 同步排除商品列表
+    if (slots.excluded_gifts) {
+      excludedGifts = slots.excluded_gifts;
+    }
+
+    const bar = document.getElementById('slots-bar');
+
+    // 显示当前模式
+    let modeChip = '';
+    if (userIntent === 'chat') {
+      modeChip = '<span class="slot-chip" style="background:#e0f2fe;color:#0369a1;">💬 聊天模式</span>';
+    } else {
+      modeChip = '<span class="slot-chip" style="background:#fef3c7;color:#92400e;">🎁 挑礼模式</span>';
+    }
+
+    const labels = {
+      recipient: { label: '送给', icon: '👤' },
+      occasion:  { label: '场合', icon: '🎊' },
+      budget:    { label: '预算', icon: '💰' },
+      gift_type: { label: '类型', icon: '🎁' },
+      timeline:  { label: '时间', icon: '⏰' },
+      category:  { label: '品类', icon: '📦' },
+      preference:{ label: '偏好', icon: '💫' },
+    };
+    const chips = Object.entries(slots)
+      .filter(([k, v]) => v && labels[k])
+      .map(([k, v]) => {
+        const { label, icon } = labels[k];
+        return `<span class="slot-chip">${icon} ${label}：${v}</span>`;
+      });
+
+    const allChips = [modeChip, ...chips];
+    bar.innerHTML = allChips.length > 1
+      ? allChips.join('')
+      : modeChip + '<span style="color:#aaa; font-size:0.8rem;">💡 开始对话，我会记录你的需求...</span>';
+  }
+
+  function getStatusMessage() {
+    // 根据当前状态返回合适的提示语
+    const hasRecipient = slots.recipient;
+    const hasOccasion = slots.occasion;
+    const hasBudget = slots.budget;
+    const hasGiftType = slots.gift_type;
+    const hasRecommendations = lastRecommendations.length > 0;
+
+    // 如果已经有推荐，用户可能在反馈
+    if (hasRecommendations) {
+      return '调整推荐中...';
+    }
+
+    // 检查必填信息是否完整
+    const requiredFields = [hasRecipient, hasOccasion, hasBudget, hasGiftType];
+    const filledCount = requiredFields.filter(Boolean).length;
+
+    if (filledCount === 0) {
+      return '理解送礼意图中...';
+    } else if (filledCount < 4) {
+      return '了解需求中...';
+    } else {
+      return '精心挑选礼物中...';
+    }
+  }
+
+  function showTyping() {
+    const chatArea = document.getElementById('chat-area');
+    const div = document.createElement('div');
+    const id = 'typing-' + Date.now();
+    div.id = id;
+    div.className = 'message bot';
+
+    const statusText = getStatusMessage();
+
+    div.innerHTML = `
+      <div class="avatar bot-avatar">🎁</div>
+      <div style="flex:1;">
+        <div class="status-text">${statusText}</div>
+        <div class="typing"><span></span><span></span><span></span></div>
+      </div>
+    `;
+    chatArea.appendChild(div);
+    scrollToBottom();
+    return id;
+  }
+
+  function removeTyping(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function scrollToBottom() {
+    const chatWrapper = document.querySelector('.chat-wrapper');
+    setTimeout(() => chatWrapper.scrollTop = chatWrapper.scrollHeight, 50);
+  }
+
+  function setLoading(val) {
+    isLoading = val;
+    document.getElementById('send-btn').disabled = val;
+    document.getElementById('user-input').disabled = val;
+  }
+
+  function handleKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function resetChat() {
+    history = [];
+    slots = {};
+    document.getElementById('slots-bar').innerHTML =
+      '<span style="color:#aaa; font-size:0.8rem;">💡 开始对话，我会记录你的需求...</span>';
+    document.getElementById('chat-area').innerHTML = `
+      <div class="message bot">
+        <div class="avatar bot-avatar">🎁</div>
+        <div>
+          <div class="bubble">
+            重新开始！告诉我你想送礼物给谁吧 🎁<br/>
+            说说 <strong>送给谁、什么场合、大概预算</strong>，我来帮你搞定 ✨
+          </div>
+          <div class="quick-replies">
+            <button class="quick-reply" onclick="sendQuick('女朋友生日，预算300-500元')">🎂 女朋友生日</button>
+            <button class="quick-reply" onclick="sendQuick('父母节日礼物，预算500元左右')">👨‍👩‍👧 父母节日</button>
+            <button class="quick-reply" onclick="sendQuick('朋友升职，想送个有意义的礼物，预算200元')">🎊 朋友升职</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+</script>
+
+</body>
+</html>
