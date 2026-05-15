@@ -1,6 +1,9 @@
-# GiftMaster
-# 挑礼大师 - Multi-Agent 送礼推荐系统
-
+# GiftMaster - 挑礼大师 - Multi-Agent 送礼推荐系统
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-2.x-black?logo=flask&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-Multi--Agent-purple)
+![Status](https://img.shields.io/badge/Status-Active-success)
 基于 LangGraph 的智能送礼推荐助手，通过多Agent协作帮助用户快速找到合适的礼物。
 
 ## 项目结构
